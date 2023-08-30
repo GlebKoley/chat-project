@@ -4,4 +4,6 @@
 
 * {
    font-family: 'Lato', sans-serif;
+   scrollbar-color: #1e4ead50 white;
+   scrollbar-width: thin;
 }

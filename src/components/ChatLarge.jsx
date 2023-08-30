@@ -45,9 +45,10 @@ const ChatLarge = () => {
    };
 
    return (
-      <aside className="flex flex-col justify-center pl-4 ">
-         <p className="text-[18px] font-bold leading-6 py-[20px]">All chats</p>
-         <ul className="sticky bottom-0-0 max-h-screen overflow-y-scroll scrollbar scrollbar-thumb-slate-400 scrollbar-track-gray-200">
+      <aside className="flex flex-col justify-center h-screen shadow-chatListShadow">
+         <p className="text-[18px] font-bold leading-6 py-[20px] shadow-headerShadow pl-4">All chats</p>
+
+         <ul className="sticky bottom-0-0 max-h-screen overflow-y-scroll shadow-chatListShadow border-r-[1px] pl-4">
             <li>
                {chat.map((item) => {
                   if (item.created_at) {
@@ -75,20 +76,12 @@ export { ChatLarge };
 
 const View = ({ title, avatar, message, time, onClick }) => {
    return (
-      //bg-[#407efb14]
       <div onClick={onClick} className="flex gap-4 items-center  py-[15px] h-[72px] cursor-pointer hover:bg-[#201f1e0a]">
          <img src={avatar} alt="Profile image" className="w-12 h-12 rounded"></img>
-         {/* <div className="flex relative flex-col gap-y-[2px] text-[15px] leading-5 "> */}
          <div className="flex flex-col items-start gap-[2px] flex-[1_0_0] relative break-all overflow-hidden text-ellipsis pr-[15px]">
-            {/* display: flex;
-flex-direction: column;
-align-items: flex-start;
-gap: 2px;
-flex: 1 0 0;  */}
             <p className="font-bold w-[89%] whitespace-nowrap text-ellipsis overflow-hidden">{title}</p>
             <span className="absolute right-[15px] top-0 text-[13px] text-[#605E5C]">{time}</span>
-            <span className="text-[#605E5C] max-h-5 w-[100%] whitespace-nowrap text-ellipsis overflow-hidden">{message + '...'}</span>
-            {/* </div> */}
+            <span className="text-[#605E5C] max-h-5 w-[100%] whitespace-nowrap text-ellipsis overflow-hidden">{message}</span>
          </div>
       </div>
    );
