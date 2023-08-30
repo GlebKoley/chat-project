@@ -1,14 +1,15 @@
 import { Header } from './Header';
-import { ChatLarge } from './ChatLarge';
-import { MessageArea } from './MessageArea';
+import { ChatItemList } from './ChatItemList';
+import { Message } from './Message';
 
 function App() {
    return (
       <div className="grid grid-cols-[25%_75%] columns-rev">
-         <header className="order-2">
+         <div className="order-2 flex flex-col">
             <Header />
-         </header>
-         <ChatLarge className="order-1" />
+            <Message />
+         </div>
+         <ChatItemList className="order-1" />
       </div>
    );
 }

@@ -5,8 +5,14 @@ export default {
       extend: {
          colors: {
             colorShadow: '#201f1e1f',
+            colorChats: '#605E5C',
+            colorTextMessage: '#201F1E',
+            bgColorActiveChat: '#407EC914',
+            bgColorHoverChat: '#201f1e0a',
+            bgColorMyMessage: 'rgba(64, 126, 201, 0.16)',
+            bgColorMessageTime: 'rgba(64, 126, 201, 0.08)',
+            bgColorAnswerUser: '#F3F3F3',
          },
-         // Adds a new breakpoint in addition to the default breakpoints
          boxShadow: {
             headerShadow: 'inset 0px -1px 0px 0px rgba(32, 31, 30, 0.12)',
             chatListShadow: 'inset -1px 0px 0px 0px rgba(32, 31, 30, 0.12)',
