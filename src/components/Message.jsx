@@ -1,16 +1,51 @@
 import ReadMessageIcon from '../assets/Read-message-icon.svg';
-import CommonPng from '../assets/Placeholder 48.png';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
 const Message = () => {
+   const [chat, setChat] = useState([]);
+   const chatId = useSelector((state) => state.currentChatId);
+
+   useEffect(() => {
+      if (chatId === null) return;
+      const getData = async () => {
+         const request = await fetch(`https://api.lenzaos.com/message.get?chat_id=${chatId}&offset=0&limit=100`, {
+            method: 'GET',
+            headers: {
+               accept: 'application/json',
+               version: '0.0',
+            },
+         });
+
+         return await request.json().then((data) => setChat(data.response));
+      };
+      getData();
+   }, [chatId]);
+
+   if (chat.length < 1) return;
+
+   const transformChatDate = (date) => {
+      const parseDate = new Date(date);
+      return `${parseDate.getUTCHours().toString()}:${parseDate.getUTCMinutes().toString()}`;
+   };
+
    return (
-      <main>
-         <div className="px-[24px] flex flex-col gap-[12px] ">
-            <Time />
-            <MessageType isMyMessage={false} />
-            <MessageType isMyMessage={true} />
-            <MessageType isMyMessage={true} />
-            <MessageType isMyMessage={false} />
-         </div>
-      </main>
+      <div className="flex flex-col gap-[12px] px-[24px] overflow-y-scroll">
+         <Time />
+         {chat.map((person) => {
+            return (
+               <MessageType
+                  key={person.id}
+                  isMyMessage={person.user.you === true ? true : false}
+                  messageText={person.message}
+                  personName={person.user.name + ' ' + person.user.surname}
+                  avatar={person.user.avatar}
+                  time={transformChatDate(person.created_at)}
+               />
+            );
+         })}
+      </div>
    );
 };
 
@@ -26,52 +61,35 @@ const Time = () => {
    );
 };
 
-const MessageType = ({ isMyMessage }) => {
+const MessageType = ({ isMyMessage, messageText, personName, avatar, time }) => {
    let classesFlex = isMyMessage === true ? 'justify-end' : 'justify-start';
-   let classesBgColor = isMyMessage === true ? 'bgColorMyMessage' : 'bgColorAnswerUser';
-
-   if (isMyMessage === false) {
-      return (
-         <div className="flex gap-[8px]">
-            <div className="shrink-0">
-               <img className="mt-[2px] rounded-[4px]" src={CommonPng} alt="Avatar image"></img>
-            </div>
-
-            <div className={`flex flex-col ${classesFlex} gap-[4px] max-w-[46%]`}>
-               <span className="text-[15px] font-bold">Alex Santiago</span>
-               <SecondComment classesBgColor={classesBgColor} text={'dwwwwwwwwwwwwwwwwwwwwwwwwwdawdawadwwwwwwwwwwwwwwwwwwwwwwwwwdawdawadwwwwwww'} />
-               <SecondComment classesBgColor={classesBgColor} text={'dwwwwwwwwwwwwwwwwwwww'} />
-            </div>
-         </div>
-      );
-   }
+   let classesBgColor = isMyMessage === true ? 'bg-bgColorMyMessage' : 'bg-bgColorAnswerUser';
 
    return (
-      <>
-         <div className={`flex ${classesFlex}`}>
-            <div className="max-w-[50%]">
-               <div className={`inline-flex justify-end flex-row gap-[12px] py-[8px] px-[12px] bg-${classesBgColor} items-end rounded-[4px] `}>
-                  <p className="text-colorTextMessage">Lorem ipsum dolor sit amet, consectetur adipiscing</p>
-                  <div className="flex flex-row gap-[2px] text-colorChats ">
+      <div className={`flex gap-[8px] ${classesFlex}`}>
+         {isMyMessage === false && (
+            <div id="user_avatar" className="shrink-0">
+               <img className="mt-[2px] rounded-[4px] w-12" src={avatar} alt="Avatar image"></img>
+            </div>
+         )}
+         <div className={`flex flex-col gap-[4px] ${isMyMessage === false ? 'max-w-[42%]' : 'max-w-[46%]'}`}>
+            {isMyMessage === false && <span className="text-[15px] font-bold">{personName}</span>}
+            <div className={`inline-flex flex-row gap-[12px] py-[8px] px-[12px] items-end rounded-[4px] ${classesBgColor}`}>
+               <p className="text-colorTextMessage">{messageText}</p>
+               <div className="flex flex-row gap-[2px] text-colorChats">
+                  <span className="text-[14px]">{time}</span>
+                  <img className="max-w-none" src={ReadMessageIcon} alt="Read message icon" />
+               </div>
+            </div>
+            {/* <div id="second_comment">
+               <div className={`inline-flex justify-between flex-row gap-[12px] py-[8px] px-[12px] items-end rounded-[4px] ${classesBgColor}`}>
+                  <p className="text-colorTextMessage break-all">{messageText}</p>
+                  <div className="flex flex-row gap-[2px] text-colorChats">
                      <span className="text-[14px]">21:31</span>
                      <img className="max-w-none" src={ReadMessageIcon} alt="Read message icon" />
                   </div>
                </div>
-            </div>
-         </div>
-      </>
-   );
-};
-
-const SecondComment = ({ classesBgColor, text }) => {
-   return (
-      <div className="">
-         <div className={`inline-flex justify-between flex-row gap-[12px] py-[8px] px-[12px] bg-${classesBgColor} items-end rounded-[4px]`}>
-            <p className="text-colorTextMessage break-all">{text}</p>
-            <div className="flex flex-row gap-[2px] text-colorChats ">
-               <span className="text-[14px]">21:31</span>
-               <img className="max-w-none" src={ReadMessageIcon} alt="Read message icon" />
-            </div>
+            </div> */}
          </div>
       </div>
    );

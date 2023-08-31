@@ -1,11 +1,16 @@
 import { useEffect } from 'react';
 import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { chatListFetchedDone, chatListFetching, setCurrentChatId, setCurrentChatTitle } from '../redux/actions/actions';
 
 const ChatItemList = () => {
-   const [chat, setChat] = useState([]);
-   const [activeChat, setActiveChat] = useState([]);
+   const { chatList, chatListLoadingStatus } = useSelector((state) => state);
+   const dispatch = useDispatch();
 
    useEffect(() => {
+      dispatch(chatListFetching());
+
       const getData = async () => {
          const request = await fetch('https://api.lenzaos.com/chat.get?offset=0&limit=100', {
             method: 'GET',
@@ -15,29 +20,13 @@ const ChatItemList = () => {
             },
          });
 
-         const data = await request.json().then((data) => setChat(data.response));
+         // return await request.json().then((data) => setChat(data.response.sort((a, b) => a.created_at < b.created_at)));
+         return await request.json().then((data) => dispatch(chatListFetchedDone(data.response.sort((a, b) => a.created_at < b.created_at))));
       };
       getData();
    }, []);
 
-   const getActiveChat = (id) => {
-      const getData = async () => {
-         const request = await fetch(`https://api.lenzaos.com/message.get?chat_id=${id}&offset=0&limit=100`, {
-            method: 'GET',
-            headers: {
-               accept: 'application/json',
-               version: '0.0',
-            },
-         });
-
-         const data = await request.json();
-         return data;
-      };
-      getData().then((data) => {
-         setActiveChat(data);
-      });
-   };
-   if (chat.length < 1) return;
+   if (chatListLoadingStatus === 'loading') return <p>Loading...</p>;
 
    const transformChatDate = (date) => {
       const parseDate = new Date(date);
@@ -45,29 +34,27 @@ const ChatItemList = () => {
    };
 
    return (
-      <aside className="flex flex-col justify-center h-screen shadow-chatListShadow">
-         <p className="text-[18px] font-bold leading-6 py-[20px] shadow-headerShadow pl-4">All chats</p>
-         <ul className="sticky bottom-0-0 max-h-screen overflow-y-scroll shadow-chatListShadow border-r-[1px] pl-4">
-            <li>
-               {chat.map((item) => {
-                  if (item.created_at) {
-                     return (
-                        <View
-                           onClick={() => {
-                              getActiveChat(item.id);
-                           }}
-                           key={item.id}
-                           avatar={item.avatar}
-                           title={item.title}
-                           surname={item['last_message']['user_surname']}
-                           message={item['last_message']['message']}
-                           time={transformChatDate(item.created_at)}></View>
-                     );
-                  }
-               })}
-            </li>
-         </ul>
-      </aside>
+      <ul className="sticky bottom-0-0 max-h-screen overflow-y-scroll shadow-chatListShadow border-r-[1px] pl-4">
+         <li>
+            {chatList.map((item) => {
+               if (item.created_at) {
+                  return (
+                     <View
+                        onClick={() => {
+                           dispatch(setCurrentChatId(item.id));
+                           dispatch(setCurrentChatTitle(item.title));
+                        }}
+                        key={item.id}
+                        avatar={item.avatar}
+                        title={item.title}
+                        surname={item['last_message']['user_surname']}
+                        message={item['last_message']['message']}
+                        time={transformChatDate(item.created_at)}></View>
+                  );
+               }
+            })}
+         </li>
+      </ul>
    );
 };
 
@@ -75,10 +62,10 @@ export { ChatItemList };
 
 const View = ({ title, avatar, message, time, onClick }) => {
    return (
-      <div onClick={onClick} className="flex gap-4 items-center  py-[15px] h-[72px] cursor-pointer hover:bg-bgColorHoverChat">
+      <div onClick={onClick} className="flex gap-4 items-center py-[15px] h-[72px] cursor-pointer hover:bg-bgColorHoverChat">
          <img src={avatar} alt="Profile image" className="w-12 h-12 rounded"></img>
          <div className="flex flex-col items-start gap-[2px] flex-[1_0_0] relative break-all overflow-hidden text-ellipsis pr-[15px]">
-            <p className="font-bold w-[89%] whitespace-nowrap text-ellipsis overflow-hidden">{title}</p>
+            <p className="font-bold w-[89%] whitespace-nowrap text-ellipsis overflow-hidden capitalize   ">{title}</p>
             <span className="absolute right-[15px] top-0 text-[13px] text-colorChats">{time}</span>
             <span className="text-colorChats max-h-5 w-[100%] whitespace-nowrap text-ellipsis overflow-hidden">{message}</span>
          </div>
