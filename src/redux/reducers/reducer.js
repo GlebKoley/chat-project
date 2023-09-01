@@ -2,6 +2,7 @@ const initialState = {
    chatList: [],
    currentActiveChat: [],
    currentChatId: null,
+   currentChatDate: null,
    currentChatTitle: 'Please select chat',
    chatListLoadingStatus: 'false',
    currentActiveChatLoadingStatus: 'false',
@@ -30,18 +31,23 @@ const reducer = (state = initialState, action) => {
             ...state,
             currentChatTitle: action.payload,
          };
+      case 'SET_CURRENT_CHAT_DATE':
+         return {
+            ...state,
+            currentChatDate: action.payload,
+         };
       // case 'HEROES_FETCHING_ERROR':
       //    return {
       //       ...state,
       //       heroesLoadingStatus: 'error',
       //    };
 
-      case 'CURRENT_ACTIVE_CHAT_FETCHING':
+      case 'CHAT_BY_ID_FETCHING':
          return {
             ...state,
             currentActiveChatLoadingStatus: 'loading',
          };
-      case 'CURRENT_ACTIVE_CHAT_FETCHED_DONE':
+      case 'CHAT_BY_ID_FETCHING_FETCHED_DONE':
          return {
             ...state,
             currentActiveChat: action.payload,

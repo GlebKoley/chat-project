@@ -12,12 +12,12 @@ const Input = () => {
                   className="w-full rounded-[4px] border-[1px] py-[10px] px-[16px] outline outline-[1px] outline-slate-600 hover:outline-[2px] focus:outline-[2px]"
                />
                <button className="absolute top-[7px] right-[7px]">
-                  <img src={IconAddFile} alt="Icon Add File" />
+                  <img src={IconAddFile} alt="Icon Add File" className="hover:bg-slate-200 hover:rounded-xl" />
                </button>
             </div>
             <div>
                <button type="submit">
-                  <img src={IconSendMessage} alt="Icon Send Message" className="h-[46px]" />
+                  <img src={IconSendMessage} alt="Icon Send Message" className="h-[46px] hover:scale-125" />
                </button>
             </div>
          </form>

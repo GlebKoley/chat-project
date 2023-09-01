@@ -25,15 +25,22 @@ export const setCurrentChatTitle = (chatTitle) => {
    };
 };
 
-export const currentActiveChatFetching = () => {
+export const setCurrentChatDate = (date) => {
    return {
-      type: 'CURRENT_ACTIVE_CHAT_FETCHING',
+      type: 'SET_CURRENT_CHAT_DATE',
+      payload: date,
    };
 };
 
-export const currentActiveChatFetchedDone = (currentChat) => {
+export const chatByIdFetching = () => {
    return {
-      type: 'CURRENT_ACTIVE_CHAT_FETCHED_DONE',
+      type: 'CHAT_BY_ID_FETCHING',
+   };
+};
+
+export const chatByIdFetchedDone = (currentChat) => {
+   return {
+      type: 'CHAT_BY_ID_FETCHING_FETCHED_DONE',
       payload: currentChat,
    };
 };

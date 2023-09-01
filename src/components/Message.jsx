@@ -1,48 +1,43 @@
 import ReadMessageIcon from '../assets/Read-message-icon.svg';
 import { useEffect } from 'react';
-import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useGetChatById } from '../hooks/useGetChatById';
+
+import { chatByIdFetching, chatByIdFetchedDone } from '../redux/actions/actions';
+import { _transformChatTime, _transformChatDate } from '../utils/formatDate';
 
 const Message = () => {
-   const [chat, setChat] = useState([]);
-   const chatId = useSelector((state) => state.currentChatId);
+   const { currentChatId, currentActiveChat, currentChatDate } = useSelector((state) => state);
+   const dispatch = useDispatch();
+   const { getChatById } = useGetChatById();
 
    useEffect(() => {
-      if (chatId === null) return;
-      const getData = async () => {
-         const request = await fetch(`https://api.lenzaos.com/message.get?chat_id=${chatId}&offset=0&limit=100`, {
-            method: 'GET',
-            headers: {
-               accept: 'application/json',
-               version: '0.0',
-            },
-         });
+      if (currentChatId === null) return;
 
-         return await request.json().then((data) => setChat(data.response));
-      };
-      getData();
-   }, [chatId]);
+      dispatch(chatByIdFetching());
+      getChatById(currentChatId).then((data) => dispatch(chatByIdFetchedDone(data)));
+   }, [currentChatId]);
 
-   if (chat.length < 1) return;
-
-   const transformChatDate = (date) => {
-      const parseDate = new Date(date);
-      return `${parseDate.getUTCHours().toString()}:${parseDate.getUTCMinutes().toString()}`;
-   };
+   if (currentActiveChat.length < 1) return <p>Loading...</p>;
 
    return (
-      <div className="flex flex-col gap-[12px] px-[24px] overflow-y-scroll">
-         <Time />
-         {chat.map((person) => {
+      <div className="flex flex-col gap-[12px] overflow-y-scroll mt-[16px]">
+         {currentActiveChat.map((person) => {
+            console.log(person);
             return (
-               <MessageType
-                  key={person.id}
-                  isMyMessage={person.user.you === true ? true : false}
-                  messageText={person.message}
-                  personName={person.user.name + ' ' + person.user.surname}
-                  avatar={person.user.avatar}
-                  time={transformChatDate(person.created_at)}
-               />
+               <>
+                  <Time currentChatDate={_transformChatDate(person.created_at) === currentChatDate ? null : _transformChatDate(person.created_at)} />
+                  {/* <p className="text-5xl">{_transformChatDate(person.created_at)}</p> */}
+                  {person.is_new === true ? <NewMessage /> : ''}
+                  <MessageType
+                     key={person.id}
+                     isMyMessage={person.user.you === true ? true : false}
+                     messageText={person.message}
+                     personName={person.user.name + ' ' + person.user.surname}
+                     avatar={person.user.avatar}
+                     time={_transformChatTime(person.created_at)}
+                  />
+               </>
             );
          })}
       </div>
@@ -51,11 +46,19 @@ const Message = () => {
 
 export { Message };
 
-const Time = () => {
+const NewMessage = () => {
+   return (
+      <div className="bg-bgColorActiveChat  py-1 px-3 text-center">
+         <span className="text-[#407EC9] leading-4 text-[14px]">Новые сообщения</span>
+      </div>
+   );
+};
+
+const Time = ({ currentChatDate }) => {
    return (
       <div className="inline-flex justify-center items-center">
          <span className=" rounded-[4px] px-[12px] py-[8px] font-normal leading-4 text-[14px] color-[#201F1E] not-italic bg-bgColorMessageTime">
-            11.02.2021
+            {currentChatDate}
          </span>
       </div>
    );
@@ -66,7 +69,7 @@ const MessageType = ({ isMyMessage, messageText, personName, avatar, time }) => 
    let classesBgColor = isMyMessage === true ? 'bg-bgColorMyMessage' : 'bg-bgColorAnswerUser';
 
    return (
-      <div className={`flex gap-[8px] ${classesFlex}`}>
+      <div className={`flex px-4 gap-[8px] ${classesFlex}`}>
          {isMyMessage === false && (
             <div id="user_avatar" className="shrink-0">
                <img className="mt-[2px] rounded-[4px] w-12" src={avatar} alt="Avatar image"></img>
